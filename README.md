@@ -1,0 +1,1 @@
+# kogakuinconvenient-joblist.github.io
