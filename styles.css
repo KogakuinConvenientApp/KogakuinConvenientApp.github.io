@@ -1,0 +1,186 @@
+/* ボディの基本スタイルとコントロールエリアの隠れ対策 */
+body {
+    padding-top: 60px; /* 固定されたコントロールエリアが隠れないように余白を追加 */
+}
+
+/* コントロールエリアのスタイルを右上に固定 */
+#controls {
+    position: fixed; /* 右上に固定 */
+    top: 10px; /* 上からの距離 */
+    right: 10px; /* 右からの距離 */
+    display: flex;
+    gap: 10px; /* ボタン間のスペース */
+    justify-content: center; /* ボタンを中央揃え */
+    background-color: white; /* 背景色を白に設定 */
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* 他のコンテンツより前面に表示 */
+}
+
+/* 表示内容設定ウィンドウのスタイル */
+#configWindow {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 80vh;
+    overflow-y: auto; /* 縦スクロールを有効に */
+    display: none;
+}
+
+/* フィルター設定ウィンドウのスタイル */
+#filterWindow {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    max-height: 80vh;
+    overflow-y: auto; /* 縦スクロールを有効に */
+    display: none;
+}
+#filterOptions {
+    max-height: 60vh;
+    overflow-y: auto; /* 縦スクロールを有効に */
+    margin-bottom: 10px;
+}
+
+/* チェックボックスのコンテナのスタイル */
+#checkboxContainer {
+    max-height: 60vh;
+    overflow-y: auto; /* 縦スクロールを有効に */
+    margin-bottom: 10px;
+}
+
+/* テーブル全体のスタイル */
+#output {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto; /* テーブルを中央に配置 */
+    overflow: auto; /* 横スクロールを有効に */
+}
+
+/* テーブル内のヘッダーのスタイル */
+#output thead {
+    position: sticky; /* ヘッダーを固定 */
+    top: 0;
+    background-color: #f8f9fa; /* ヘッダーの背景色 */
+    z-index: 10; /* 他のコンテンツより前面に表示 */
+}
+
+/* セルのスタイル */
+#output th, #output td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap; /* テキストを折り返さない */
+}
+
+/* 空のセルに適用するスタイル */
+.empty-cell {
+    white-space: nowrap; /* 空セルも折り返さない */
+    text-align: left;
+}
+
+/* 横スクロールを許可するためのスタイル */
+#output-wrapper {
+    overflow-x: auto; /* 横スクロールを有効にする */
+    max-width: 100%; /* 画面幅を超えないように制限 */
+}
+
+
+/* ソートウィンドウのスタイル */
+#sortWindow {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2000; /* z-index を高めに設定 */
+    max-height: 80vh;
+    overflow-y: auto; /* 縦スクロールを有効に */
+    display: none;
+}
+
+#filterExplantion{
+    color: #00f;
+    position: relative;
+}
+#filterExplantion .title {
+    position: absolute;
+    top: 18px;
+    background: white;
+    border: 1px solid gray;
+    padding: 5px;
+    right: -20px;
+    white-space: nowrap;
+    font-size: 50%;
+}
+#hfil{
+    display: inline;
+}
+
+.square_btn{
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-right: 0;
+    margin-left: auto;
+    display: block;
+    position: relative;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #333;
+    background: #fff;
+}
+.square_btn::before, .square_btn::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 3px; /* 棒の幅（太さ） */
+    height: 27px; /* 棒の高さ */
+    background: #333; /* バツ印の色 */
+  }
+   
+.square_btn::before {
+    transform: translate(-50%,-50%) rotate(45deg);
+}
+   
+.square_btn::after {
+    transform: translate(-50%,-50%) rotate(-45deg);
+}
+
+/*リストのテスト用*/
+#list {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    max-height: 80vh;
+    overflow-y: auto; 
+    display: none;
+    width: 50%;
+}
+#listTable td{
+    overflow: auto;
+    border: 1px solid #ddd;
+    white-space: nowrap;
+}
