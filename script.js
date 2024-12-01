@@ -42,7 +42,7 @@ function displayTable(headers, data) {
             const td = document.createElement('td');
             const cell = row[cellIndex];
             if (cell === undefined || cell === null || cell === '') {
-                td.innerHTML = '&nbsp;';
+                td.innerHTML = '　';
                 td.classList.add('empty-cell');
             } else {
                 td.textContent = cell;
@@ -170,6 +170,8 @@ function toggleSort() {
 // ソートウィンドウのオプションを生成
 function generateSortOptions(headers) {
     sortOptionsContainer.innerHTML = ''; // 既存のオプションをクリア
+    sortIndex = 0;
+
 
     headers.forEach((header, index) => {
         if (sortArrangement.includes(header)) {
@@ -177,9 +179,10 @@ function generateSortOptions(headers) {
             const ascLabel = document.createElement('label');
             const descLabel = document.createElement('label');
 
+
             const ascButton = document.createElement('input');
             ascButton.type = 'radio';
-            ascButton.name = `sortColumn_${index}`;
+            ascButton.name = `sortColumn_${index}_sortIndex_${sortIndex}`;
             ascButton.value = 'asc';
             ascLabel.addEventListener("mouseup", clearRadioButton);
             ascLabel.appendChild(ascButton);
@@ -188,17 +191,40 @@ function generateSortOptions(headers) {
            
             const descButton = document.createElement('input');
             descButton.type = 'radio';
-            descButton.name = `sortColumn_${index}`;
+            descButton.name = `sortColumn_${index}_sortIndex_${sortIndex}`;
             descButton.value = 'desc';
             descLabel.addEventListener("mouseup", clearRadioButton);
             descLabel.appendChild(descButton);
             descLabel.appendChild(document.createTextNode('降順'));
             sortOptionsContainer.appendChild(descLabel);
 
+
+            const span=document.createElement("span");
+            const text=document.createElement("input");
+            const plusButton=document.createElement("input");
+            const minusButton=document.createElement("input");
+            text.type="text";
+            plusButton.type="button";
+            minusButton.type="button";
+            text.value=1;
+            plusButton.value="+";
+            minusButton.value="-";
+            text.size=1;
+            plusButton.addEventListener("click",function(){this.parentNode.firstChild.value++;});
+            minusButton.addEventListener("click",function(){this.parentNode.firstChild.value--;});
+            span.appendChild(text);
+            span.appendChild(plusButton);
+            span.appendChild(minusButton);
+            sortOptionsContainer.appendChild(document.createTextNode('　　優先順位'));
+            sortOptionsContainer.appendChild(span);
+
+
             sortOptionsContainer.appendChild(document.createElement('br'));
+            sortIndex++;
         }
     });
 }
+
 //選択済みラジオボタンをクリックで未選択に
 function clearRadioButton(){
     const radioButton = this.firstChild;
@@ -214,24 +240,31 @@ applySortButton.addEventListener('click', function () {
     sortWindow.style.display = 'none';// ソートウィンドウを非表示に
     const selectedSort = getSelectedSortOption(); // 選択されたソートオプションを取得
     if (selectedSort) {
-        sortTableByColumn(selectedSort.index, selectedSort.order); // 指定された列でソート
+        selectedSort.forEach((element)=>{
+     	   sortTableByColumn(element.index, element.order); // 指定された列でソート
+        }); // 指定された列でソート
     }
 });
+
 
 // 選択されたソートオプションを取得
 function getSelectedSortOption() {
     const sortOptions = sortOptionsContainer.querySelectorAll('input[type="radio"]:checked');
+    const priority = sortOptionsContainer.querySelectorAll('input[type="text"]');
     if (sortOptions.length === 0) return null;
-
-
+   
+    let sortData = [];
     for (let i = 0; i < sortOptions.length; i++) {
         const radio = sortOptions[i];
         const columnIndex = parseInt(radio.name.split('_')[1], 10);
+        const sortIndex =  parseInt(radio.name.split('_')[3], 10);
         const sortOrder = radio.value;
-        return { index: columnIndex, order: sortOrder };
+        sortData.push({ index: columnIndex, order: sortOrder, sortIndex:sortIndex });
     }
-    return null;
+    sortData.sort((a,b)=>{return priority[b.sortIndex].value - priority[a.sortIndex].value;});
+    return sortData;
 }
+
 
 // ソート処理
 function sortTableByColumn(columnIndex, order) {
@@ -249,6 +282,7 @@ function sortTableByColumn(columnIndex, order) {
     });
     displayTable(headers, data); // ソート後にテーブルを再描画
     processFilter();
+    console.log("「"+outputTable.rows[0].cells[columnIndex].innerHTML+"」を「"+order+"」でソートしました。")
 }
 
 filterWindow.style.display = 'none';
@@ -272,7 +306,7 @@ function closeFilterWindow(){
 // フィルタを適応する  
 function applyFilter() {  
     filterInput = document.getElementById('filterInput').value;//フィルタ式入力欄の取得  
-    if(filterInput == "/list"){console.log("/list");//リストのテスト用
+    if(filterInput == "/list"){//リストのテスト用
         list.style.display = "block"; 
         return;
     }
@@ -282,7 +316,7 @@ function applyFilter() {
 }
 //フィルタ処理
 function processFilter(){
-    let filterArrangement = tokenize(filterInput);//式を分割してフィルタ用配列に入れる
+    let filterArrangement = tokenize(filterInput);console.log("トークン化:",filterArrangement);//式を分割してフィルタ用配列に入れる
     let filterArrangementIndex = 0;  
     let priority = 0;//優先順位  
     let filterObject = [];//優先順位とフィルタ用配列のインデックスを紐付け 
@@ -300,6 +334,8 @@ function processFilter(){
             filterObject.push({index:filterArrangementIndex,priority:priority});  
         }else{  
             filterArrangement[filterArrangementIndex]=EDConversion(filterArrangement[filterArrangementIndex]);
+            if(filterArrangement[filterArrangementIndex]=="ERROR")
+                return;
         }  
         filterArrangementIndex++;  
     }  
@@ -310,7 +346,7 @@ function processFilter(){
             filterObject[index].priority+=0.5;
     });
     //優先順位によって並び替え  
-    filterObject.sort((a,b)=>{return b.priority-a.priority});  console.log(filterObject)
+    filterObject.sort((a,b)=>{return b.priority-a.priority});  
    
     //ANDとORとNOTの実行  
    
@@ -320,20 +356,28 @@ function processFilter(){
         do{  
             up++;  
             if(up >= filterArrangement.length){  
-                alert("式の構成に問題があります。");  
+                alert("式の構成に問題があります。\nコンソールを確認してください。");  
                 return;  
             }  
         }while(filterArrangement[up]==='');  
+        if(filterArrangement[up]==="AND" || filterArrangement[up]==="OR" || filterArrangement[up]==="NOT"){
+            alert("式の構成に問題があります。\nコンソールを確認してください。");
+            return;
+        }
         if(filterArrangement[down]==="NOT"){
             filterArrangement[down] = notfilter(filterArrangement[up]);
         }else{
             do{  
                 down--;  
                 if(down < 0){  
-                    alert("式の構成に問題があります。");  
+                    alert("式の構成に問題があります。\nコンソールを確認してください。");  
                     return;  
                 }  
             }while(filterArrangement[down]==='');  
+            if(filterArrangement[down]==="AND" || filterArrangement[down]==="OR" || filterArrangement[down]==="NOT"){
+                alert("式の構成に問題があります。\nコンソールを確認してください。");
+                return;
+            }
             filterArrangement[down] = (filterArrangement[filterObject[filterObjectIndex].index]==="OR") ? orfilter(filterArrangement[up], filterArrangement[down]) : andfilter(filterArrangement[up], filterArrangement[down]);  
             filterArrangement[filterObject[filterObjectIndex].index]="";
         }
@@ -355,7 +399,7 @@ function processFilter(){
 
 function tokenize(expression) {  
     const tokens = [];  
-    const regex = /(\(|\)|AND|OR|NOT|\S+_\w+_[^\(\) ]+)/g;  
+    const regex = /(\(|\)|AND|OR|NOT|[^ ]+_\w+_[^\(\) ]+)/g;  
     let match;  
 
     while ((match = regex.exec(expression)) !== null) {  
@@ -374,9 +418,12 @@ function EDConversion(condition) {
         columnIndex = "all";  
     } else if (column.startsWith("columns[")) {  
         columnIndex = parseInt(column.match(/\d+/)[0]);
-    } else {  
+    } else if(columnMapping.hasOwnProperty(column)){  
         columnIndex = columnMapping[column];  
-    }  
+    } else {
+        alert("列「"+column+"」が見つかりません");
+        return "ERROR";
+    }
    
     if(comparator === "contains" || comparator === "c")  
         return containsFunc(columnIndex, value);  
@@ -385,8 +432,8 @@ function EDConversion(condition) {
     else if(comparator === "range" || comparator === "r")  
         return rangeFunc(columnIndex, value);  
     else{  
-        alert("比較方法に問題があります。");  
-        return;  
+        alert("比較方法「"+comparator+"」に問題があります。");  
+        return "ERROR";  
     }  
 }  
 
@@ -429,13 +476,13 @@ function exactFunc(columnIndex, value){
     return filterData;  
 }  
 function rangeFunc(columnIndex, value){  
-    const regexp = /\d*:\d*/;    
+    const regexp = /^\d*:\d*$/;    
     let most = [];  
     if(regexp.test(value)){  
         most = value.split(":");  
     }else{  
-        alert("rangeのデータ"+value+"が実行出来ません");  
-        return ERROR;  
+        alert("rangeの内容「"+value+"」が実行出来ません");  
+        return "ERROR";  
     }  
     (most[0] == "") ? most[0] = Number.MIN_VALUE : most[0]=Number.parseFloat(most[0]);  
     (most[1] == "") ? most[1] = Number.MAX_VALUE : most[1]=Number.parseFloat(most[1]);  
@@ -719,7 +766,7 @@ function zIndexClickFunc(e){
     if(eleid.includes("Window"))
         zIndexFunc(document.getElementById(eleid));
 }
-function zIndexFunc(window) {console.log(window);
+function zIndexFunc(window) {
     filterWindow.style.zIndex=1000;
     sortWindow.style.zIndex=1000;
     configWindow.style.zIndex=1000;
@@ -729,7 +776,7 @@ function zIndexFunc(window) {console.log(window);
 //リストのテスト用
 const listTable = document.getElementById("listTable");
 const list = document.getElementById("list");
-function addList(){console.log(this);
+function addList(){
     this.removeEventListener("click",addList);
     const listRow = this.cloneNode(true);
     listRow.addEventListener("click",removeList);
