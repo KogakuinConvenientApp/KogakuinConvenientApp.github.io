@@ -293,8 +293,8 @@ function toggleFilterWindow() {
 }  
 // フィルタ設定ウィンドウの非表示(適用状態に戻す)  
 function closeFilterWindow(){  
-    filterWindow.style.display = "none";  
-    if(filterCheckboxArrangementSave.length){
+    filterWindow.style.display = "none";  console.log("非表示");
+    if(filterCheckboxArrangementSave.length){console.log("適応状態");
         for(let i=0;i<filterCheckboxArrangement.length;i++){
             for(let j=0;j<filterCheckboxArrangement[i].length;j++)
                 filterCheckboxArrangement[i][j].checked = filterCheckboxArrangementSave[i][j];
