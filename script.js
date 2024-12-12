@@ -294,7 +294,7 @@ function toggleFilterWindow() {
 // フィルタ設定ウィンドウの非表示(適用状態に戻す)  
 function closeFilterWindow(){  
     filterWindow.style.display = "none";  
-    if(!filterCheckboxArrangementSave){
+    if(filterCheckboxArrangementSave.length){
         for(let i=0;i<filterCheckboxArrangement.length;i++){
             for(let j=0;j<filterCheckboxArrangement[i].length;j++)
                 filterCheckboxArrangement[i][j].checked = filterCheckboxArrangementSave[i][j];
