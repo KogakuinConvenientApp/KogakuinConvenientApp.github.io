@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>求人票リスト表示</title>
+    <link rel="stylesheet" href="joblist.css">
+    <link rel="apple-touch-icon" href="KogakuinConvenientAppIcon.gif">
+    <!-- XLSX ライブラリの追加 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+    <!-- ファイル選択エリア -->
+    <input type="file" id="fileInput" accept=".xlsx" />　　　※フィルタ機能でバグが起こらないように半角の括弧と空白が全角に変換されます。
+
+    <!-- テーブル -->
+    <table id="output">
+        <thead>
+            <tr>
+                <th>Header 1</th>
+                <th>Header 2</th>
+                <th>Header 3</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Row 1 Col 1</td>
+                <td>Row 1 Col 2</td>
+                <td>Row 1 Col 3</td>
+            </tr>
+            <!-- 他の行 -->
+        </tbody>
+    </table>
+
+    <!-- コントロールエリアをテーブルの下に移動 -->
+    <div id="controls" style="margin-top: 20px;">
+        <button id="toggleView" onclick="toggleViewFunc()">簡易表示に切り替え</button>
+        <button onclick="toggleConfig()">表示内容の設定</button>
+        <button onclick="toggleFilterWindow()">フィルタ</button>
+        <button onclick="toggleSort()">ソート</button>
+    </div>
+
+
+    <!-- 表示内容の設定用ウィンドウ -->
+    <div id="configWindow">
+        <h3>表示内容の設定</h3><button onclick='allSelection("displayContent")'>全選択</button><button onclick='allCancellation("displayContent")'>全解除</button>
+        <div id="checkboxContainer"></div>
+        <button onclick="applyConfig()">適用</button>
+    </div>
+
+    <!-- フィルター設定用ウィンドウ -->
+    <div id="filterWindow">
+        <span class="square_btn" onclick="closeFilterWindow()"></span>
+        <h3 id="hfil">フィルタ設定</h3>　　　　　　　　　　　　　　　
+        <span title="基本構造：列_比較方法_内容&#13;
+        　列：「a」,「all」で全て列、列のヘッダ名か「columns[列数-1]」で列を指定&#13;
+        　比較方法：「contains」,「c」で部分一致、「exact」,「e」で完全一致、「range」,「r」で数値範囲&#13;
+        　内容：部分一致と完全一致の場合は書いた内容、数値範囲の場合は「数値1:数値2」で数値1以上数値2未満でフィルタ&#13;&#10;
+        演算子
+        　()：中の演算を先に行う&#13;
+        　NOT：右に書いたフィルタのデータの表示,非表示を逆転する&#13;
+        　AND：左右でANDフィルタをする&#13;
+        　OR：左右でORフィルタをする" id="filterExplantion">使い方</span><br>
+        <label for="filterInput">フィルタ条件式:</label>  
+        <input type="text" id="filterInput">  
+        <button onclick="applyFilter()">適応</button>  
+        <br><br>
+        <div id="filterOptions"></div>
+    </div>
+
+    <!-- ソートウィンドウ -->
+    <div id="sortWindow">
+        <h3>ソート設定</h3>
+        <div id="sortOptions"></div>
+        <button id="applySort">適用</button>
+    </div>
+
+    <!-- リストテーブルのテスト用ウィンドウ -->
+    <div id="list"><button onclick="closeList()">閉じる</button><table id="listTable"></table></div>
+
+    <script src="フィルタとソートの操作.js"></script>
+    <script src="joblist.js"></script>
+</body>
+</html>
