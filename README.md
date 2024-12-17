@@ -1,1 +1,1 @@
-# kogakuinconvenient-joblist.github.io
+# KogakuinConvenientApp.github.io
